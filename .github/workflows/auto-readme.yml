@@ -1,0 +1,40 @@
+name: Dynamic Workspace Indexer
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '**/*.ipynb'
+      - '**/*.py'
+
+jobs:
+  rebuild-markdown:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch Codebase
+        uses: actions/checkout@v4
+
+      - name: Generate Dynamic File Tree
+        run: |
+          # Extract everything before the repository structure section
+          sed -n '1,/## 📂 Repository Structure/p' README.md > new_readme.md
+          echo "" >> new_readme.md
+          echo "The repository automatically documents its contents. Current interactive notebooks:" >> new_readme.md
+          echo "" >> new_readme.md
+          
+          # Find all notebook files and format them as bullet points
+          find . -name "*.ipynb" -not -path "*/.*" | sed 's|^\./|*   **|' | sed 's/\.ipynb$/\.ipynb**/g' >> new_readme.md
+          echo "" >> new_readme.md
+          
+          # Append everything after the next section marker back into the file
+          sed -n '/## 🚀 Getting Started/,$p' README.md >> new_readme.md
+          mv new_readme.md README.md
+
+      - name: Commit Updated Index
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md
+          git diff --quiet && git diff --staged --quiet || git commit -m "chore: automated workspace mapping [skip ci]"
+          git push
