@@ -8,6 +8,7 @@ This repository covers essential text-cleaning methodologies and tokenization pr
 
 The repository automatically documents its contents. Current interactive notebooks:
 
+*   **Word2Vector.ipynb**
 *   **Text_Cleaning_Punctuation&White_Space.ipynb**
 *   **Tokenization_using_NLTK.ipynb**
 *   **BOW(Bag_Of_Word).ipynb**
